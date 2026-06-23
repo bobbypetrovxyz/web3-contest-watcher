@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.db
+.env
+logs/*.log
+build/
+dist/
+*.egg-info/
+PROJECT_STATE.md

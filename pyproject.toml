@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "web3-contest-watcher"
+version = "1.0.0"
+description = "Watches web3 security contests & bug bounties and alerts you on new listings and 24h-before start, across pluggable notification channels."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Bozhidar Petrov", email = "bojidar.petrov@gmail.com" }]
+keywords = ["web3", "security", "audit", "contest", "bug-bounty", "notifications"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Environment :: Console",
+]
+# Runtime is standard-library only — no required dependencies.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/bobbypetrovxyz/web3-contest-watcher"
+Issues = "https://github.com/bobbypetrovxyz/web3-contest-watcher/issues"
+
+[project.scripts]
+web3-watch = "watcher.run:main"
+
+[tool.setuptools.packages.find]
+include = ["watcher*"]

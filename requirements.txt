@@ -1,0 +1,5 @@
+# V1 runtime uses only the Python standard library (sqlite3, smtplib, email,
+# urllib, json). No third-party packages are required to run the watcher.
+
+# Development / testing only:
+pytest>=7.0

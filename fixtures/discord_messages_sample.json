@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1000000000000000001",
+    "timestamp": "2026-06-23T10:00:00.000000+00:00",
+    "content": "",
+    "author": {"username": "Sherlock", "bot": true},
+    "webhook_id": "999000000000000000",
+    "embeds": [
+      {
+        "title": "New Contest: Acme Lending",
+        "url": "https://audits.sherlock.xyz/contests/123",
+        "description": "Acme is a lending protocol. $50,000 prize pool. Starts soon.",
+        "author": {"name": "Sherlock"},
+        "timestamp": "2026-06-23T10:00:00.000Z"
+      }
+    ]
+  },
+  {
+    "id": "1000000000000000002",
+    "timestamp": "2026-06-23T09:00:00.000000+00:00",
+    "content": "New audit competition is live! Details: https://code4rena.com/audits/2026-06-acme",
+    "author": {"username": "Code4rena", "bot": true},
+    "webhook_id": "888000000000000000",
+    "embeds": []
+  }
+]
