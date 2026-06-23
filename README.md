@@ -155,6 +155,43 @@ crontab -e
 alerts. At an 8h cadence the `t24h` alert already lands 16–24h before start
 (worst case). For reliable timing, use an always-on host (see `Dockerfile`).
 
+## Deploy with Docker
+
+The image bundles its own Python (`FROM python:3.12-slim`) and the watcher is
+stdlib-only, so **the host needs nothing but a container runtime** — no Python,
+pip, or dependencies. State lives in a mounted volume so it survives restarts.
+
+```bash
+docker build -t web3-watch .
+docker run --rm --env-file .env -v "$PWD/data:/data" web3-watch
+```
+
+`--env-file .env` supplies config/secrets (nothing sensitive is baked into the
+image); `-v …:/data` persists the SQLite DB at `WATCHER_DB_PATH=/data/watcher.db`.
+
+**Schedule it** (the container runs once and exits — the host scheduler sets
+cadence):
+
+```bash
+# host crontab — every 8h
+0 */8 * * * docker run --rm --env-file /opt/web3-watch/.env -v /opt/web3-watch/data:/data web3-watch >> /var/log/web3-watch.log 2>&1
+```
+
+(or a Kubernetes `CronJob`, Nomad periodic job, systemd timer, etc.)
+
+**Getting the image onto a server** — any of:
+- **Registry** (recommended): push to Docker Hub / GHCR, then `docker pull` on the server.
+- **Build on the server**: `git clone` + `docker build`.
+- **Offline**: `docker save web3-watch | gzip > web3-watch.tgz`, copy it over, `docker load < web3-watch.tgz`.
+
+**CPU architecture** must match the server. A build on an x86 machine is
+`amd64`; most cloud VMs are x86. For ARM hosts (e.g. Oracle Ampere free tier),
+either build on that box or cross-build a multi-arch image:
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -t <registry>/web3-watch --push .
+```
+
 ## Failure handling
 
 Sources are fetched independently:
