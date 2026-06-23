@@ -4,8 +4,8 @@
 FROM python:3.12-slim
 
 WORKDIR /app
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Runtime is Python standard library only — no pip install needed.
+# (requirements.txt holds dev/test deps; not required to run the watcher.)
 COPY watcher ./watcher
 
 ENV WATCHER_DB_PATH=/data/watcher.db
