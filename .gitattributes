@@ -1,0 +1,3 @@
+# Captured web pages / API responses used only as parser test fixtures.
+# Exclude them from GitHub language statistics so the repo reads as Python.
+fixtures/** linguist-vendored
