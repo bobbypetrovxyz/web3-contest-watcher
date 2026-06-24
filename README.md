@@ -215,6 +215,41 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) to add a channel or a contest source.
 
 ## Architecture
 
+```
+                 ┌──────────────────────────────────────────────┐
+  scheduler ───► │           watcher.run  (the conductor)        │
+ (cron/Docker,   └──────────────────────────────────────────────┘
+  every 8h)                          │
+                                     ▼
+       ┌──────────────────── 1. fetch all sources ───────────────────────┐
+       │  dailywarden · sherlock · immunefi · cantina · sch · discord     │
+       │  each Source.fetch() → list of normalized Contest records        │
+       │  (failure-isolated: one source down ≠ the others stop)           │
+       └───────────────────────────────┬─────────────────────────────────┘
+                                        ▼
+                         2. merge + dedupe by id
+                                        ▼
+       ┌──────────────────────────────────────────────────────────────────┐
+       │  3. compare against Store (SQLite "memory")                       │
+       │       • already seen      → skip                                  │
+       │       • brand new         → [New Contest] / [New Bounty]          │
+       │       • starts within 24h → [Starting soon]   (contests only)     │
+       └───────────────────────────────┬──────────────────────────────────┘
+                                        ▼
+                        4. digest: format the message
+                                        ▼
+       ┌──────────────────── 5. fan-out to channels ─────────────────────┐
+       │  telegram · discord · slack · email · webhook · console          │
+       │  each Notifier.send(subject, body)  (one fails ≠ blocks others)  │
+       └───────────────────────────────┬─────────────────────────────────┘
+                                        ▼
+                       6. record sent alerts in Store
+```
+
+The whole pipeline runs start-to-finish on each scheduled tick, then exits. The
+SQLite "memory" is what makes it idempotent — each alert fires at most once,
+independent of how often it runs.
+
 A deterministic core with two plugin seams, fanned out over many instances:
 - **`Source`** (`watcher/sources/base.py`) — `fetch() -> list[Contest]`;
   selected via `WATCHER_SOURCES`, fetched with per-source failure isolation.
